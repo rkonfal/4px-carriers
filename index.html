@@ -636,8 +636,8 @@ body {
     <div style="border-top:1px solid var(--border);padding-top:28px;margin-top:4px;" id="cena-za-balik">
       <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text);">Cena za balík — všichni přepravci</div>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
-        Průměr za leden a únor 2026. 4PX (sklad + handling) je poděleno celkovým počtem zásilek —
-        vztahuje se na <em>každý</em> balík bez ohledu na přepravce.
+        Průměr za leden a únor 2026. 4PX (pouze handling/expedice) je poděleno celkovým počtem zásilek —
+        vztahuje se na <em>každý</em> balík bez ohledu na přepravce. Obalový materiál a tisk jsou sledovány zvlášť.
         Ostatní přepravci jsou děleni pouze svými zásilkami.
       </p>
 
@@ -659,11 +659,11 @@ body {
           <text x="75" y="34"  text-anchor="end" font-size="10" fill="#6b7280">120</text>
           <text x="14" y="145" text-anchor="middle" font-size="10" fill="#6b7280" transform="rotate(-90,14,145)">Kč/balík</text>
 
-          <!-- 4PX: avg=57.39 → h=105.2 y=144.8≈145 -->
-          <rect x="100" y="145" width="80" height="105" fill="#10b981" rx="3"/>
-          <text x="140" y="137" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">57,39 Kč</text>
+          <!-- 4PX: avg=48.77 → h=89.4 y=160.6≈161 -->
+          <rect x="100" y="161" width="80" height="89" fill="#10b981" rx="3"/>
+          <text x="140" y="153" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">48,77 Kč</text>
           <text x="140" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">4PX</text>
-          <text x="140" y="285" text-anchor="middle" font-size="10" fill="#6b7280">sklad+handling</text>
+          <text x="140" y="285" text-anchor="middle" font-size="10" fill="#6b7280">pouze handling</text>
 
           <!-- Česká pošta: avg=47.84 → h=87.7 y=162.3≈162 -->
           <rect x="210" y="162" width="80" height="88"  fill="#5C2450" rx="3"/>
@@ -684,7 +684,7 @@ body {
 
       <!-- Legend -->
       <div class="legend" style="margin-bottom:24px;">
-        <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> 4PX (sklad + handling)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> 4PX (pouze handling)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#5C2450;"></div> Česká pošta</div>
         <div class="legend-item"><div class="legend-dot" style="background:#6366f1;"></div> Packeta</div>
         <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div> DPD</div>
@@ -704,10 +704,10 @@ body {
           </thead>
           <tbody>
             <tr>
-              <td><span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:2px;margin-right:6px;"></span>4PX (sklad + handling)</td>
-              <td>61,74 Kč</td>
-              <td>53,04 Kč</td>
-              <td><strong>57,39 Kč</strong></td>
+              <td><span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:2px;margin-right:6px;"></span>4PX (pouze handling)</td>
+              <td>52,52 Kč</td>
+              <td>45,01 Kč</td>
+              <td><strong>48,77 Kč</strong></td>
               <td style="font-size:12px;color:var(--text-muted);">Celkové zásilky (9 904 / 10 193)</td>
             </tr>
             <tr>
@@ -749,24 +749,24 @@ body {
             </thead>
             <tbody>
               <tr>
-                <td>Celkem 4PX/balík</td>
-                <td><strong>61,74 Kč</strong></td>
-                <td><strong>53,04 Kč</strong></td>
+                <td><strong>Handling/expedice</strong> <span style="font-size:11px;color:#10b981;font-weight:600;">(zahrnuto v nákladech)</span></td>
+                <td><strong>52,52 Kč</strong></td>
+                <td><strong>45,01 Kč</strong></td>
               </tr>
-              <tr>
-                <td>Handling/expedice</td>
-                <td>52,52 Kč</td>
-                <td>45,01 Kč</td>
-              </tr>
-              <tr>
-                <td>Obalový materiál</td>
+              <tr style="color:var(--text-muted);font-style:italic;">
+                <td>Obalový materiál <span style="font-size:11px;">(sledováno zvlášť)</span></td>
                 <td>0,33 Kč</td>
                 <td>5,48 Kč</td>
               </tr>
-              <tr>
-                <td>Tisk/tiskoviny</td>
+              <tr style="color:var(--text-muted);font-style:italic;">
+                <td>Tisk/tiskoviny <span style="font-size:11px;">(sledováno zvlášť)</span></td>
                 <td>8,89 Kč</td>
                 <td>2,54 Kč</td>
+              </tr>
+              <tr style="border-top:1px solid var(--border);">
+                <td style="font-size:12px;color:var(--text-muted);">Celkem 4PX/balík (informativně)</td>
+                <td style="font-size:12px;color:var(--text-muted);">61,74 Kč</td>
+                <td style="font-size:12px;color:var(--text-muted);">53,04 Kč</td>
               </tr>
             </tbody>
           </table>
