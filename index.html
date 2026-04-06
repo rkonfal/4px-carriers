@@ -349,7 +349,7 @@ body {
     <a href="https://rkonfal.github.io/4px-obalovy-material/"><span class="report-emoji">📦</span> Obalový materiál</a>
     <a href="https://rkonfal.github.io/4px-kpi-dashboard/"><span class="report-emoji">📊</span> Delivery KPI</a>
     <a href="https://rkonfal.github.io/4px-carriers/" class="report-active"><span class="report-emoji">🚚</span> Přepravci</a>
-    <a href="#" class="report-active"><span class="report-emoji">🚚</span> Přepravci</a>
+    <a href="https://rkonfal.github.io/eshop-dashboard/"><span class="report-emoji">🛒</span> E-shop</a>
   </nav>
   <div class="sidebar-divider"></div>
   <nav class="sidebar-nav">
@@ -380,6 +380,10 @@ body {
     <a href="#czsk">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21V3h18v18H3zM3 12h18"/></svg>
       CZ vs SK
+    </a>
+    <a href="#payments">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+      Způsoby plateb
     </a>
   </nav>
   <div class="sidebar-footer">
@@ -487,6 +491,39 @@ body {
       Rozložení CZ vs SK dle přepravce
     </div>
     <div id="czskContent"></div>
+  </div>
+
+  <!-- PAYMENT METHODS -->
+  <div class="section" id="payments">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+      Způsoby plateb zákazníků
+    </div>
+    <div class="two-col" style="align-items:start">
+      <div class="donut-wrapper" style="justify-content:flex-start;gap:32px">
+        <svg id="payDonut" viewBox="0 0 200 200" width="200" height="200"></svg>
+        <div class="donut-stats" id="payDonutStats"></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr><th>Způsob platby</th><th>Objednávky</th><th>Podíl</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Bezpečná platba online (GoPay)</td><td>17 466</td><td>52,9 %</td></tr>
+            <tr><td>Platba převodem</td><td>9 670</td><td>29,3 %</td></tr>
+            <tr><td>Dobírkou</td><td>5 205</td><td>15,8 %</td></tr>
+            <tr><td>Platba kartou</td><td>359</td><td>1,1 %</td></tr>
+            <tr><td>Hotově</td><td>225</td><td>0,7 %</td></tr>
+            <tr><td>Twisto &amp; Faktura</td><td>76</td><td>0,2 %</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td>CELKEM</td><td>33 001</td><td>100,0 %</td></tr>
+          </tfoot>
+        </table>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:10px;">Zdroj: WPJ e-shop API, Q1 2026 (01.01–06.04.2026), 33 006 aktivních objednávek</div>
+      </div>
+    </div>
   </div>
 
   <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:var(--text-muted);">
@@ -760,6 +797,40 @@ function drawCZSK() {
   document.getElementById('czskContent').innerHTML = html;
 }
 
+function drawPayments() {
+  const payData = [
+    {name:'GoPay online',count:17466,color:'#5C2450'},
+    {name:'Převodem',count:9670,color:'#e6a817'},
+    {name:'Dobírkou',count:5205,color:'#22c55e'},
+    {name:'Kartou',count:359,color:'#6366f1'},
+    {name:'Hotově',count:225,color:'#ef4444'},
+    {name:'Ostatní',count:76,color:'#9ca3af'}
+  ];
+  const total = payData.reduce((s,d)=>s+d.count,0);
+  const svg = document.getElementById('payDonut');
+  const cx=100,cy=100,R=85,r=52;
+  let angle=-Math.PI/2, paths='';
+  payData.forEach(d=>{
+    const a=(d.count/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle);
+    const x2=cx+R*Math.cos(angle+a),y2=cy+R*Math.sin(angle+a);
+    const x3=cx+r*Math.cos(angle+a),y3=cy+r*Math.sin(angle+a);
+    const x4=cx+r*Math.cos(angle),y4=cy+r*Math.sin(angle);
+    const lg=a>Math.PI?1:0;
+    paths+=`<path d="M${x1},${y1} A${R},${R} 0 ${lg},1 ${x2},${y2} L${x3},${y3} A${r},${r} 0 ${lg},0 ${x4},${y4} Z" fill="${d.color}"><title>${d.name}: ${d.count.toLocaleString('cs')} (${(d.count/total*100).toFixed(1)} %)</title></path>`;
+    angle+=a;
+  });
+  const tc=getTextColor();
+  paths+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="20" font-weight="800" fill="${tc}">${(total/1000).toFixed(1)}k</text>`;
+  paths+=`<text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="10" fill="${tc}">objednávek</text>`;
+  svg.innerHTML=paths;
+  document.getElementById('payDonutStats').innerHTML=payData.map(d=>`
+    <div class="donut-stat">
+      <div class="donut-stat-left"><div class="dot" style="background:${d.color}"></div>${d.name}</div>
+      <div class="donut-stat-right">${(d.count/total*100).toFixed(1)}&nbsp;%</div>
+    </div>`).join('');
+}
+
 function drawAll() {
   drawDonut();
   drawStackedBar();
@@ -767,6 +838,7 @@ function drawAll() {
   drawTrendAnalysis();
   drawProcessingChart();
   drawCZSK();
+  drawPayments();
 }
 drawAll();
 
