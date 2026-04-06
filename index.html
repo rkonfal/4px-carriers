@@ -385,6 +385,10 @@ body {
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       💰 Náklady
     </a>
+    <a href="#cena-za-balik">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM1 10h22"/></svg>
+      📦 Cena za balík
+    </a>
     <a href="#payments">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
       Způsoby plateb
@@ -628,110 +632,155 @@ body {
       </table>
     </div>
 
-    <!-- 4PX sub-section -->
-    <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:4px;">
-      <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--text);">4PX — cena za balík</div>
+    <!-- Cena za balík — všichni přepravci -->
+    <div style="border-top:1px solid var(--border);padding-top:28px;margin-top:4px;" id="cena-za-balik">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text);">Cena za balík — všichni přepravci</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
+        Průměr za leden a únor 2026. 4PX (sklad + handling) je poděleno celkovým počtem zásilek —
+        vztahuje se na <em>každý</em> balík bez ohledu na přepravce.
+        Ostatní přepravci jsou děleni pouze svými zásilkami.
+      </p>
 
-      <!-- Simple grouped bar chart for per-package costs -->
+      <!-- Single bar chart: average Kč/ks per carrier -->
+      <!-- viewBox 600×300, y_bottom=250, y_top=30, chart_h=220, max=120 Kč, scale≈1.833 -->
       <div class="chart-container" style="margin-bottom:16px;">
-        <svg viewBox="0 0 600 260" style="display:block;margin:0 auto;max-width:100%;">
+        <svg viewBox="0 0 600 310" style="display:block;margin:0 auto;max-width:100%;">
           <!-- Grid -->
-          <line x1="80" y1="210" x2="560" y2="210" stroke="var(--border)" stroke-width="1"/>
-          <line x1="80" y1="172" x2="560" y2="172" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="80" y1="134" x2="560" y2="134" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="80" y1="96"  x2="560" y2="96"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="80" y1="58"  x2="560" y2="58"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
-          <text x="75" y="214" text-anchor="end" font-size="10" fill="#6b7280">0</text>
-          <text x="75" y="176" text-anchor="end" font-size="10" fill="#6b7280">20</text>
-          <text x="75" y="138" text-anchor="end" font-size="10" fill="#6b7280">40</text>
-          <text x="75" y="100" text-anchor="end" font-size="10" fill="#6b7280">60</text>
-          <text x="75" y="62"  text-anchor="end" font-size="10" fill="#6b7280">80</text>
-          <text x="14" y="140" text-anchor="middle" font-size="10" fill="#6b7280" transform="rotate(-90,14,140)">Kč/balík</text>
+          <line x1="80" y1="250" x2="580" y2="250" stroke="var(--border)" stroke-width="1"/>
+          <line x1="80" y1="195" x2="580" y2="195" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="80" y1="140" x2="580" y2="140" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="80" y1="85"  x2="580" y2="85"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="80" y1="30"  x2="580" y2="30"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Y labels -->
+          <text x="75" y="254" text-anchor="end" font-size="10" fill="#6b7280">0</text>
+          <text x="75" y="199" text-anchor="end" font-size="10" fill="#6b7280">30</text>
+          <text x="75" y="144" text-anchor="end" font-size="10" fill="#6b7280">60</text>
+          <text x="75" y="89"  text-anchor="end" font-size="10" fill="#6b7280">90</text>
+          <text x="75" y="34"  text-anchor="end" font-size="10" fill="#6b7280">120</text>
+          <text x="14" y="145" text-anchor="middle" font-size="10" fill="#6b7280" transform="rotate(-90,14,145)">Kč/balík</text>
 
-          <!-- Scale: max=80, chart_h=152 (y:58-210), scale=152/80=1.9 per Kc -->
-          <!-- Leden components: Handling=52.52, Tisk=8.89, Obal=0.33, Total=61.74 -->
-          <!-- Únor components: Handling=45.01, Tisk=2.54, Obal=5.48, Total=53.03 -->
-          <!-- Bar groups: x positions 160 and 360, bar_w=100, component bars side by side within group -->
+          <!-- 4PX: avg=57.39 → h=105.2 y=144.8≈145 -->
+          <rect x="100" y="145" width="80" height="105" fill="#10b981" rx="3"/>
+          <text x="140" y="137" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">57,39 Kč</text>
+          <text x="140" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">4PX</text>
+          <text x="140" y="285" text-anchor="middle" font-size="10" fill="#6b7280">sklad+handling</text>
 
-          <!-- Leden total bar (full, background) at x=150, w=100 -->
-          <!-- Stacked: Handling bottom, then Obal, then Tisk on top -->
-          <!-- Leden stacked (bottom-up): Handling=52.52 h=99.8≈100, Obal=0.33 h≈0.6≈1, Tisk=8.89 h≈16.9≈17 -->
-          <!-- Handling: y=210-100=110, h=100 -->
-          <!-- Obal: y=110-1=109, h=1 -->
-          <!-- Tisk: y=109-17=92, h=17 -->
-          <!-- Total top y=92, total label y=84 -->
-          <rect x="150" y="110" width="100" height="100" fill="#10b981" rx="2"/>
-          <rect x="150" y="109" width="100" height="1"   fill="#6366f1" rx="0"/>
-          <rect x="150" y="92"  width="100" height="17"  fill="#f59e0b" rx="0"/>
-          <rect x="150" y="92"  width="100" height="4"   fill="#f59e0b" rx="2"/>
-          <text x="200" y="84" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">61,74 Kč</text>
-          <text x="200" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Leden</text>
-          <text x="200" y="246" text-anchor="middle" font-size="11" fill="#6b7280">(9 904 obj.)</text>
+          <!-- Česká pošta: avg=47.84 → h=87.7 y=162.3≈162 -->
+          <rect x="210" y="162" width="80" height="88"  fill="#5C2450" rx="3"/>
+          <text x="250" y="154" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">47,84 Kč</text>
+          <text x="250" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Česká pošta</text>
 
-          <!-- Únor stacked: Handling=45.01 h=85.5≈86, Obal=5.48 h=10.4≈10, Tisk=2.54 h=4.8≈5 -->
-          <!-- Handling: y=210-86=124, h=86 -->
-          <!-- Obal: y=124-10=114, h=10 -->
-          <!-- Tisk: y=114-5=109, h=5 -->
-          <!-- Total top y=109 -->
-          <rect x="350" y="124" width="100" height="86" fill="#10b981" rx="2"/>
-          <rect x="350" y="114" width="100" height="10" fill="#6366f1" rx="0"/>
-          <rect x="350" y="109" width="100" height="5"  fill="#f59e0b" rx="0"/>
-          <rect x="350" y="109" width="100" height="4"  fill="#f59e0b" rx="2"/>
-          <text x="400" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">53,04 Kč</text>
-          <text x="400" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Únor</text>
-          <text x="400" y="246" text-anchor="middle" font-size="11" fill="#6b7280">(10 193 obj.)</text>
+          <!-- Packeta: avg=94.83 → h=173.8 y=76.2≈76 -->
+          <rect x="330" y="76"  width="80" height="174" fill="#6366f1" rx="3"/>
+          <text x="370" y="68"  text-anchor="middle" font-size="12" font-weight="700" fill="#374151">94,83 Kč</text>
+          <text x="370" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Packeta</text>
+
+          <!-- DPD: avg=101.42 → h=185.9 y=64.1≈64 -->
+          <rect x="450" y="64"  width="80" height="186" fill="#f59e0b" rx="3"/>
+          <text x="490" y="56"  text-anchor="middle" font-size="12" font-weight="700" fill="#374151">101,42 Kč</text>
+          <text x="490" y="272" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">DPD</text>
         </svg>
       </div>
-      <!-- Legend for per-package chart -->
-      <div class="legend" style="margin-bottom:16px;">
-        <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Handling/expedice</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#6366f1;"></div> Obalový materál</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div> Tisk/tiskoviny</div>
+
+      <!-- Legend -->
+      <div class="legend" style="margin-bottom:24px;">
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> 4PX (sklad + handling)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5C2450;"></div> Česká pošta</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6366f1;"></div> Packeta</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div> DPD</div>
       </div>
 
-      <!-- Per-package table -->
-      <div style="overflow-x:auto;">
+      <!-- Summary table -->
+      <div style="overflow-x:auto;margin-bottom:24px;">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Položka</th>
-              <th>Leden (9 904 obj.)</th>
-              <th>Únor (10 193 obj.)</th>
+              <th>Přepravce</th>
+              <th>Leden — Kč/ks</th>
+              <th>Únor — Kč/ks</th>
+              <th>Průměr Kč/ks</th>
+              <th>Základ výpočtu</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Celkem 4PX/balík</td>
-              <td><strong>61,74 Kč</strong></td>
-              <td><strong>53,04 Kč</strong></td>
+              <td><span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:2px;margin-right:6px;"></span>4PX (sklad + handling)</td>
+              <td>61,74 Kč</td>
+              <td>53,04 Kč</td>
+              <td><strong>57,39 Kč</strong></td>
+              <td style="font-size:12px;color:var(--text-muted);">Celkové zásilky (9 904 / 10 193)</td>
             </tr>
             <tr>
-              <td>Handling/expedice</td>
-              <td>52,52 Kč</td>
-              <td>45,01 Kč</td>
+              <td><span style="display:inline-block;width:10px;height:10px;background:#5C2450;border-radius:2px;margin-right:6px;"></span>Česká pošta</td>
+              <td>48,58 Kč</td>
+              <td>47,09 Kč</td>
+              <td><strong>47,84 Kč</strong></td>
+              <td style="font-size:12px;color:var(--text-muted);">Zásilky ČP (8 022 / 8 256)</td>
             </tr>
             <tr>
-              <td>Obalový materál</td>
-              <td>0,33 Kč</td>
-              <td>5,48 Kč</td>
+              <td><span style="display:inline-block;width:10px;height:10px;background:#6366f1;border-radius:2px;margin-right:6px;"></span>Packeta</td>
+              <td>63,59 Kč</td>
+              <td>126,07 Kč</td>
+              <td><strong>94,83 Kč</strong></td>
+              <td style="font-size:12px;color:var(--text-muted);">Zásilky Packeta (1 188 / 1 223)</td>
             </tr>
             <tr>
-              <td>Tisk/tiskoviny</td>
-              <td>8,89 Kč</td>
-              <td>2,54 Kč</td>
+              <td><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:6px;"></span>DPD</td>
+              <td>104,10 Kč</td>
+              <td>98,74 Kč</td>
+              <td><strong>101,42 Kč</strong></td>
+              <td style="font-size:12px;color:var(--text-muted);">Zásilky DPD (693 / 714)</td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 4PX detail breakdown -->
+      <div style="padding-top:20px;border-top:1px dashed var(--border);">
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--text-muted);">Detail 4PX — složky skladových nákladů</div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Položka</th>
+                <th>Leden (9 904 obj.)</th>
+                <th>Únor (10 193 obj.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Celkem 4PX/balík</td>
+                <td><strong>61,74 Kč</strong></td>
+                <td><strong>53,04 Kč</strong></td>
+              </tr>
+              <tr>
+                <td>Handling/expedice</td>
+                <td>52,52 Kč</td>
+                <td>45,01 Kč</td>
+              </tr>
+              <tr>
+                <td>Obalový materiál</td>
+                <td>0,33 Kč</td>
+                <td>5,48 Kč</td>
+              </tr>
+              <tr>
+                <td>Tisk/tiskoviny</td>
+                <td>8,89 Kč</td>
+                <td>2,54 Kč</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Note -->
     <div style="margin-top:16px;padding:12px 16px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-size:12.5px;color:var(--text-muted);">
-      *Březen 2026 neúuplný — Česká pošta a 4PX faktury dosud nezaúčtovány
+      *Březen 2026 neúplný — Česká pošta a 4PX faktury dosud nezaúčtovány. Počty zásilek dle přepravce: odhad na základě podílů z KPI dat (ČP ~81 %, Packeta ~12 %, DPD ~7 %).
     </div>
   </div>
 
-  <!-- PAYMENT METHODS -->
+    <!-- PAYMENT METHODS -->
   <div class="section" id="payments">
     <div class="section-title">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
