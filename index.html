@@ -510,15 +510,13 @@ body {
             <tr><th>Způsob platby</th><th>Objednávky</th><th>Podíl</th></tr>
           </thead>
           <tbody>
-            <tr><td>Bezpečná platba online (GoPay)</td><td>17 466</td><td>52,9 %</td></tr>
-            <tr><td>Platba převodem</td><td>9 670</td><td>29,3 %</td></tr>
-            <tr><td>Dobírkou</td><td>5 205</td><td>15,8 %</td></tr>
-            <tr><td>Platba kartou</td><td>359</td><td>1,1 %</td></tr>
-            <tr><td>Hotově</td><td>225</td><td>0,7 %</td></tr>
-            <tr><td>Twisto &amp; Faktura</td><td>76</td><td>0,2 %</td></tr>
+            <tr><td>Bezpečná platba online (GoPay)</td><td>17 493</td><td>53,0 %</td></tr>
+            <tr><td>Bankovní převod</td><td>9 572</td><td>29,0 %</td></tr>
+            <tr><td>Dobírka</td><td>5 281</td><td>16,0 %</td></tr>
+            <tr><td>Ostatní</td><td>660</td><td>2,0 %</td></tr>
           </tbody>
           <tfoot>
-            <tr><td>CELKEM</td><td>33 001</td><td>100,0 %</td></tr>
+            <tr><td>CELKEM</td><td>33 006</td><td>100,0 %</td></tr>
           </tfoot>
         </table>
         <div style="font-size:12px;color:var(--text-muted);margin-top:10px;">Zdroj: WPJ e-shop API, Q1 2026 (01.01–06.04.2026), 33 006 aktivních objednávek</div>
@@ -799,12 +797,10 @@ function drawCZSK() {
 
 function drawPayments() {
   const payData = [
-    {name:'GoPay online',count:17466,color:'#5C2450'},
-    {name:'Převodem',count:9670,color:'#e6a817'},
-    {name:'Dobírkou',count:5205,color:'#22c55e'},
-    {name:'Kartou',count:359,color:'#6366f1'},
-    {name:'Hotově',count:225,color:'#ef4444'},
-    {name:'Ostatní',count:76,color:'#9ca3af'}
+    {name:'GoPay online',count:17493,color:'#5C2450'},
+    {name:'Bankovní převod',count:9572,color:'#6366f1'},
+    {name:'Dobírka',count:5281,color:'#f59e0b'},
+    {name:'Ostatní',count:660,color:'#94a3b8'}
   ];
   const total = payData.reduce((s,d)=>s+d.count,0);
   const svg = document.getElementById('payDonut');
