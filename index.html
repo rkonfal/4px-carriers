@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analýza přepravců — Diamond Plus</title>
+<style>
+:root {
+  --brand: #5C2450;
+  --brand-light: #7a3a6c;
+  --brand-dark: #3e1836;
+  --accent: #e6a817;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1e1e2f;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar-w: 260px;
+  --radius: 12px;
+}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --card: #1a1c25;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --border: #2d2f3a;
+  --brand-light: #9b6490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  zoom: 0.8;
+  min-height: 100vh;
+  display: flex;
+}
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
+  color: #fff;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: transform .3s ease;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
+.sidebar-logo span { font-size: 11px; opacity: .65; display: block; margin-top: 2px; }
+.sidebar-reports { padding: 14px 0 0; }
+.sidebar-reports a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 24px;
+  color: rgba(255,255,255,.7);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-reports a:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-reports a.report-active {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-reports a .report-emoji { font-size: 15px; flex-shrink: 0; width: 18px; text-align: center; }
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,.12);
+  margin: 10px 24px;
+}
+.sidebar-nav { padding: 4px 0; flex: 1; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 24px;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-nav a svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sidebar-footer {
+  padding: 18px 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  font-size: 11px; opacity: .5;
+}
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 200;
+  background: var(--brand);
+  border: none;
+  color: #fff;
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.hamburger svg { width: 22px; height: 22px; }
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 90;
+}
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 32px 40px;
+  max-width: 1280px;
+}
+.header { margin-bottom: 32px; }
+.header h1 { font-size: 26px; font-weight: 700; color: var(--brand); }
+[data-theme="dark"] .header h1 { color: var(--brand-light); }
+.header .period { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.purple::before { background: var(--brand); }
+.kpi-card.gold::before { background: var(--accent); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
+.kpi-value { font-size: 32px; font-weight: 800; margin: 6px 0 2px; }
+.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title svg { width: 20px; height: 20px; color: var(--brand); }
+[data-theme="dark"] .section-title svg { color: var(--brand-light); }
+.chart-container { width: 100%; overflow-x: auto; }
+.chart-container svg { display: block; margin: 0 auto; }
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.legend-dot {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.donut-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.donut-stats { min-width: 200px; }
+.donut-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+.donut-stat:last-child { border-bottom: none; }
+.donut-stat .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.donut-stat-left { display: flex; align-items: center; }
+.donut-stat-right { font-weight: 700; }
+.carrier-bar-wrapper { margin: 10px 0; }
+.carrier-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.carrier-bar-track {
+  width: 100%;
+  height: 28px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.carrier-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .6s ease;
+  display: flex; align-items: center; padding-left: 10px;
+  color: #fff; font-size: 12px; font-weight: 600;
+}
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.data-table thead th {
+  background: var(--brand);
+  color: #fff;
+  padding: 11px 14px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.data-table thead th:first-child { text-align: left; border-radius: 8px 0 0 0; }
+.data-table thead th:last-child { border-radius: 0 8px 0 0; }
+.data-table tbody td {
+  padding: 10px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+.data-table tbody td:first-child { text-align: left; font-weight: 600; }
+.data-table tbody tr:hover { background: rgba(92,36,80,.04); }
+[data-theme="dark"] .data-table tbody tr:hover { background: rgba(155,100,144,.08); }
+.data-table tbody tr:last-child td { font-weight: 700; background: rgba(92,36,80,.06); }
+[data-theme="dark"] .data-table tbody tr:last-child td { background: rgba(155,100,144,.1); }
+.data-table tfoot td { font-weight: 700; padding: 11px 14px; text-align: right; }
+.data-table tfoot td:first-child { text-align: left; }
+.warning-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.warning-card {
+  border-radius: 10px;
+  padding: 20px;
+  display: flex; gap: 14px;
+  align-items: flex-start;
+}
+.warning-card.critical { background: #fef2f2; border: 1px solid #fecaca; }
+[data-theme="dark"] .warning-card.critical { background: #2a1515; border-color: #5a2020; }
+.warning-card.caution { background: #fffbeb; border: 1px solid #fde68a; }
+[data-theme="dark"] .warning-card.caution { background: #2a2510; border-color: #5a4a15; }
+.warning-card.ok { background: #f0fdf4; border: 1px solid #bbf7d0; }
+[data-theme="dark"] .warning-card.ok { background: #0f2a18; border-color: #155a2a; }
+.warning-card.info { background: #eff6ff; border: 1px solid #bfdbfe; }
+[data-theme="dark"] .warning-card.info { background: #0f1a2a; border-color: #1a3a5a; }
+.warning-icon { font-size: 28px; flex-shrink: 0; }
+.warning-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.warning-text { font-size: 12.5px; color: var(--text-muted); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.progress-bar {
+  width: 100%; height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 4px; }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+  .overlay.show { display: block; }
+  .main { margin-left: 0; padding: 24px 18px; padding-top: 68px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  body { zoom: 1; }
+}
+@media print {
+  .sidebar, .hamburger, .overlay, .theme-toggle { display: none !important; }
+  .main { margin-left: 0; padding: 20px; }
+  .section { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>DIAMOND PLUS</h2>
+    <span>Království TianDe</span>
+  </div>
+  <nav class="sidebar-reports">
+    <a href="https://rkonfal.github.io/diamond-plus-portal/"><span class="report-emoji">🏠</span> Portál</a>
+    <a href="https://rkonfal.github.io/diamond-plus-report/"><span class="report-emoji">💎</span> Finanční Dashboard</a>
+    <a href="https://rkonfal.github.io/4px-obalovy-material/"><span class="report-emoji">📦</span> Obalový materiál</a>
+    <a href="https://rkonfal.github.io/4px-kpi-dashboard/"><span class="report-emoji">📊</span> Delivery KPI</a>
+    <a href="#" class="report-active"><span class="report-emoji">🚚</span> Přepravci</a>
+  </nav>
+  <div class="sidebar-divider"></div>
+  <nav class="sidebar-nav">
+    <a href="#kpi" class="active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+      Přehled
+    </a>
+    <a href="#share">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10"/></svg>
+      Podíl přepravců
+    </a>
+    <a href="#trend">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
+      Trend po měsících
+    </a>
+    <a href="#table">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+      Data
+    </a>
+    <a href="#analysis">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      Analýza trendů
+    </a>
+    <a href="#processing">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Doba zpracování
+    </a>
+    <a href="#czsk">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21V3h18v18H3zM3 12h18"/></svg>
+      CZ vs SK
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    Report vygenerován 06.04.2026<br>
+    4PX Fulfillment Data
+  </div>
+</aside>
+
+<div class="main">
+  <div class="header" id="kpi">
+    <div class="header-row">
+      <div>
+        <h1>Analýza přepravců — Diamond Plus</h1>
+        <div class="period">Období: duben 2025 – březen 2026 &nbsp;|&nbsp; 9 měsíců &nbsp;|&nbsp; Diamond Plus / Království TianDe</div>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        Tmavý režim
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card purple">
+      <div class="kpi-label">Celkový počet zásilek</div>
+      <div class="kpi-value">113 857</div>
+      <div class="kpi-sub">za 9 měsíců (04/2025 – 03/2026)</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-label">Počet přepravců</div>
+      <div class="kpi-value">5</div>
+      <div class="kpi-sub">Česká pošta, Packeta, DPD CZ, DPD SK, Ostatní</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Nejpoužívanější přepravce</div>
+      <div class="kpi-value" style="font-size:24px;">Česká pošta</div>
+      <div class="kpi-sub">83 759 zásilek (73,6 %)</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Průměr zásilek / měsíc</div>
+      <div class="kpi-value">12 651</div>
+      <div class="kpi-sub">min 8 338 (12/25) · max 16 206 (11/25)</div>
+    </div>
+  </div>
+
+  <!-- DONUT: CARRIER SHARE -->
+  <div class="section" id="share">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10"/></svg>
+      Podíl přepravců celkově
+    </div>
+    <div class="donut-wrapper">
+      <svg id="donutChart" viewBox="0 0 200 200" width="220" height="220"></svg>
+      <div class="donut-stats" id="donutStats"></div>
+    </div>
+  </div>
+
+  <!-- STACKED BAR: TREND -->
+  <div class="section" id="trend">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
+      Trend přepravců po měsících
+    </div>
+    <div class="chart-container">
+      <svg id="stackedBar" viewBox="0 0 860 380" class="bar-chart"></svg>
+    </div>
+    <div class="legend" id="barLegend"></div>
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="section" id="table">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+      Měsíční přehled dle přepravce
+    </div>
+    <div style="overflow-x:auto;" id="tableContainer"></div>
+  </div>
+
+  <!-- TREND ANALYSIS -->
+  <div class="section" id="analysis">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      Analýza trendů přepravců
+    </div>
+    <div class="warning-grid" id="trendCards"></div>
+  </div>
+
+  <!-- PROCESSING TIME -->
+  <div class="section" id="processing">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Průměrná doba zpracování dle přepravce (hodiny)
+    </div>
+    <div class="chart-container">
+      <svg id="procChart" viewBox="0 0 860 340" class="bar-chart"></svg>
+    </div>
+    <div class="legend" id="procLegend"></div>
+  </div>
+
+  <!-- CZ vs SK -->
+  <div class="section" id="czsk">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21V3h18v18H3zM3 12h18"/></svg>
+      Rozložení CZ vs SK dle přepravce
+    </div>
+    <div id="czskContent"></div>
+  </div>
+
+  <div style="text-align:center;padding:24px 0 12px;font-size:12px;color:var(--text-muted);">
+    Diamond Plus s.r.o. / Království TianDe &nbsp;|&nbsp; 4PX Carrier Analysis &nbsp;|&nbsp; Vygenerováno 06.04.2026
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  const d = document.documentElement;
+  d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? '' : 'dark');
+  drawAll();
+}
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.overlay').classList.toggle('show');
+}
+function getTextColor() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#9ca3af' : '#6b7280';
+}
+function getGridColor() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#2d2f3a' : '#e5e7eb';
+}
+function fmt(n) { return n.toLocaleString('cs-CZ'); }
+
+// DATA
+const months = ['04/25','08/25','09/25','10/25','11/25','12/25','01/26','02/26','03/26'];
+const monthsFull = ['Duben 2025','Srpen 2025','Září 2025','Říjen 2025','Listopad 2025','Prosinec 2025','Leden 2026','Únor 2026','Březen 2026'];
+const carriers = ['CESKA_POSTA_CZ&SK','PACKETA_CZ&SK','DPD_SK','DPD_CZ','OTHER_CZ&SK'];
+const carrierNames = {'CESKA_POSTA_CZ&SK':'Česká pošta','PACKETA_CZ&SK':'Packeta','DPD_SK':'DPD SK','DPD_CZ':'DPD CZ','OTHER_CZ&SK':'Ostatní'};
+const carrierColors = {'CESKA_POSTA_CZ&SK':'#5C2450','PACKETA_CZ&SK':'#e6a817','DPD_SK':'#6366f1','DPD_CZ':'#22c55e','OTHER_CZ&SK':'#9ca3af'};
+
+const data = {
+  '04/25': {'CESKA_POSTA_CZ&SK':10077,'PACKETA_CZ&SK':2758,'DPD_SK':713,'DPD_CZ':251,'OTHER_CZ&SK':32},
+  '08/25': {'CESKA_POSTA_CZ&SK':8732,'PACKETA_CZ&SK':2131,'DPD_SK':477,'DPD_CZ':202,'OTHER_CZ&SK':14},
+  '09/25': {'CESKA_POSTA_CZ&SK':8395,'PACKETA_CZ&SK':1625,'DPD_SK':638,'DPD_CZ':157,'OTHER_CZ&SK':19},
+  '10/25': {'CESKA_POSTA_CZ&SK':10229,'PACKETA_CZ&SK':0,'DPD_SK':581,'DPD_CZ':181,'OTHER_CZ&SK':21},
+  '11/25': {'CESKA_POSTA_CZ&SK':15078,'PACKETA_CZ&SK':0,'DPD_SK':873,'DPD_CZ':244,'OTHER_CZ&SK':11},
+  '12/25': {'CESKA_POSTA_CZ&SK':6400,'PACKETA_CZ&SK':1347,'DPD_SK':407,'DPD_CZ':165,'OTHER_CZ&SK':19},
+  '01/26': {'CESKA_POSTA_CZ&SK':7642,'PACKETA_CZ&SK':1564,'DPD_SK':501,'DPD_CZ':177,'OTHER_CZ&SK':20},
+  '02/26': {'CESKA_POSTA_CZ&SK':7847,'PACKETA_CZ&SK':1675,'DPD_SK':495,'DPD_CZ':155,'OTHER_CZ&SK':21},
+  '03/26': {'CESKA_POSTA_CZ&SK':9359,'PACKETA_CZ&SK':1867,'DPD_SK':546,'DPD_CZ':190,'OTHER_CZ&SK':21}
+};
+
+const monthTotals = {};
+months.forEach(m => {
+  monthTotals[m] = carriers.reduce((s,c) => s + (data[m][c]||0), 0);
+});
+const grandTotal = Object.values(monthTotals).reduce((s,v) => s+v, 0);
+
+const carrierTotals = {};
+carriers.forEach(c => {
+  carrierTotals[c] = months.reduce((s,m) => s + (data[m][c]||0), 0);
+});
+
+// Processing times (avg hours)
+const procData = {
+  '04/25': {'CESKA_POSTA_CZ&SK':19.0,'PACKETA_CZ&SK':15.6,'DPD_SK':14.9,'DPD_CZ':18.2,'OTHER_CZ&SK':14.1},
+  '08/25': {'CESKA_POSTA_CZ&SK':19.4,'PACKETA_CZ&SK':16.7,'DPD_SK':16.3,'DPD_CZ':18.4,'OTHER_CZ&SK':65.4},
+  '09/25': {'CESKA_POSTA_CZ&SK':18.3,'PACKETA_CZ&SK':15.4,'DPD_SK':15.0,'DPD_CZ':14.6,'OTHER_CZ&SK':71.3},
+  '10/25': {'CESKA_POSTA_CZ&SK':19.6,'PACKETA_CZ&SK':0,'DPD_SK':15.3,'DPD_CZ':18.3,'OTHER_CZ&SK':49.2},
+  '11/25': {'CESKA_POSTA_CZ&SK':26.7,'PACKETA_CZ&SK':0,'DPD_SK':17.9,'DPD_CZ':26.0,'OTHER_CZ&SK':29.3},
+  '12/25': {'CESKA_POSTA_CZ&SK':25.4,'PACKETA_CZ&SK':24.9,'DPD_SK':22.5,'DPD_CZ':26.6,'OTHER_CZ&SK':55.1},
+  '01/26': {'CESKA_POSTA_CZ&SK':19.1,'PACKETA_CZ&SK':15.7,'DPD_SK':15.3,'DPD_CZ':17.1,'OTHER_CZ&SK':9.1},
+  '02/26': {'CESKA_POSTA_CZ&SK':20.5,'PACKETA_CZ&SK':16.2,'DPD_SK':14.2,'DPD_CZ':17.6,'OTHER_CZ&SK':1.3},
+  '03/26': {'CESKA_POSTA_CZ&SK':15.4,'PACKETA_CZ&SK':12.8,'DPD_SK':11.9,'DPD_CZ':13.3,'OTHER_CZ&SK':1.3}
+};
+
+// CZ vs SK
+const czData = [13118,11079,10196,10431,15333,7931,9403,9698,11437];
+const skData = [713,477,638,581,873,407,501,495,546];
+
+// DONUT CHART
+function drawDonut() {
+  const svg = document.getElementById('donutChart');
+  const total = grandTotal;
+  const sorted = carriers.slice().sort((a,b) => carrierTotals[b] - carrierTotals[a]);
+  const donutData = sorted.map(c => ({label:carrierNames[c],value:carrierTotals[c],color:carrierColors[c]}));
+  const cx=100,cy=100,R=85,r=55;
+  let angle = -Math.PI/2;
+  let paths = '';
+  donutData.forEach(d => {
+    const a = (d.value/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle);
+    const x2=cx+R*Math.cos(angle+a),y2=cy+R*Math.sin(angle+a);
+    const x3=cx+r*Math.cos(angle+a),y3=cy+r*Math.sin(angle+a);
+    const x4=cx+r*Math.cos(angle),y4=cy+r*Math.sin(angle);
+    const large = a > Math.PI ? 1 : 0;
+    paths += `<path d="M${x1},${y1} A${R},${R} 0 ${large},1 ${x2},${y2} L${x3},${y3} A${r},${r} 0 ${large},0 ${x4},${y4} Z" fill="${d.color}" style="cursor:pointer"><title>${d.label}: ${fmt(d.value)} (${(d.value/total*100).toFixed(1)} %)</title></path>`;
+    angle += a;
+  });
+  paths += `<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="18" font-weight="800" fill="${getTextColor()}">${fmt(total)}</text>`;
+  paths += `<text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="${getTextColor()}">zásilek</text>`;
+  svg.innerHTML = paths;
+
+  document.getElementById('donutStats').innerHTML = donutData.map(d => `
+    <div class="donut-stat">
+      <div class="donut-stat-left"><div class="dot" style="background:${d.color}"></div>${d.label}</div>
+      <div class="donut-stat-right">${(d.value/total*100).toFixed(1)} %</div>
+    </div>
+  `).join('');
+}
+
+// STACKED BAR
+function drawStackedBar() {
+  const svg = document.getElementById('stackedBar');
+  const W=860,H=380,pad={t:20,r:20,b:55,l:55};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+  const maxVal = Math.max(...months.map(m => monthTotals[m])) * 1.1;
+  const barW = cW/months.length*0.55;
+  const gap = cW/months.length;
+  const tc=getTextColor(),gc=getGridColor();
+  let html='';
+  for(let i=0;i<=5;i++){
+    const y=pad.t+cH-(cH*i/5);
+    const v=Math.round(maxVal*i/5);
+    html+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="${gc}" stroke-width="1"/>`;
+    html+=`<text x="${pad.l-8}" y="${y+4}" text-anchor="end" fill="${tc}" font-size="11">${fmt(v)}</text>`;
+  }
+  const orderedCarriers = carriers.slice().reverse();
+  months.forEach((m,mi) => {
+    const x=pad.l+mi*gap+gap/2-barW/2;
+    let cumY=0;
+    orderedCarriers.forEach(c => {
+      const val=data[m][c]||0;
+      if(val===0) return;
+      const h=(val/maxVal)*cH;
+      const y=pad.t+cH-cumY-h;
+      html+=`<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${carrierColors[c]}" rx="2"><title>${carrierNames[c]}: ${fmt(val)}</title></rect>`;
+      cumY+=h;
+    });
+    const totalY=pad.t+cH-(monthTotals[m]/maxVal)*cH-10;
+    html+=`<text x="${x+barW/2}" y="${totalY}" text-anchor="middle" fill="${tc}" font-size="10.5" font-weight="700">${fmt(monthTotals[m])}</text>`;
+    html+=`<text x="${x+barW/2}" y="${H-pad.b+20}" text-anchor="middle" fill="${tc}" font-size="10.5">${m}</text>`;
+  });
+  svg.innerHTML=html;
+  document.getElementById('barLegend').innerHTML = carriers.map(c => `<div class="legend-item"><div class="legend-dot" style="background:${carrierColors[c]}"></div>${carrierNames[c]}</div>`).join('');
+}
+
+// DATA TABLE
+function drawTable() {
+  const sorted = carriers.slice().sort((a,b) => carrierTotals[b]-carrierTotals[a]);
+  let html = '<table class="data-table"><thead><tr><th>Měsíc</th>';
+  sorted.forEach(c => html += `<th>${carrierNames[c]}</th>`);
+  html += '<th>Celkem</th></tr></thead><tbody>';
+  months.forEach((m,mi) => {
+    html += `<tr><td>${monthsFull[mi]}</td>`;
+    sorted.forEach(c => {
+      const v = data[m][c]||0;
+      const pct = monthTotals[m]>0 ? (v/monthTotals[m]*100).toFixed(1) : '0.0';
+      html += `<td>${fmt(v)} <span style="color:var(--text-muted);font-size:11px">(${pct} %)</span></td>`;
+    });
+    html += `<td>${fmt(monthTotals[m])}</td></tr>`;
+  });
+  // totals row
+  html += '<tr><td>CELKEM</td>';
+  sorted.forEach(c => {
+    const pct = (carrierTotals[c]/grandTotal*100).toFixed(1);
+    html += `<td>${fmt(carrierTotals[c])} <span style="color:var(--text-muted);font-size:11px">(${pct} %)</span></td>`;
+  });
+  html += `<td>${fmt(grandTotal)}</td></tr></tbody></table>`;
+  document.getElementById('tableContainer').innerHTML = html;
+}
+
+// TREND ANALYSIS
+function drawTrendAnalysis() {
+  const cards = [];
+  carriers.forEach(c => {
+    const vals = months.map(m => data[m][c]||0);
+    const first3 = vals.slice(0,3);
+    const last3 = vals.slice(-3);
+    const avgFirst = first3.reduce((s,v)=>s+v,0)/3;
+    const avgLast = last3.reduce((s,v)=>s+v,0)/3;
+    const change = avgFirst>0 ? ((avgLast-avgFirst)/avgFirst*100).toFixed(1) : 'N/A';
+    const hasZero = vals.some(v=>v===0);
+    const appeared = vals[0]===0 && vals[vals.length-1]>0;
+    const disappeared = vals[0]>0 && vals[vals.length-1]===0;
+
+    let status, icon, title, text;
+    if(change==='N/A' || Math.abs(parseFloat(change))<10) {
+      status='info'; icon='📊'; title=`${carrierNames[c]} — STABILNÍ`;
+    } else if(parseFloat(change)>0) {
+      status='ok'; icon='📈'; title=`${carrierNames[c]} — ROSTE`;
+    } else {
+      status='caution'; icon='📉'; title=`${carrierNames[c]} — KLESÁ`;
+    }
+
+    text = `Průměr první 3 měsíce: ${fmt(Math.round(avgFirst))}<br>`;
+    text += `Průměr poslední 3 měsíce: ${fmt(Math.round(avgLast))}<br>`;
+    text += `<strong>Změna: ${change} %</strong><br>`;
+    if(hasZero) text += `<em>Pozn.: V některých měsících nebyl přepravce použit (říjen/listopad u Packeta).</em>`;
+    if(disappeared) text += `<em>Přepravce vypadl z provozu.</em>`;
+
+    cards.push(`<div class="warning-card ${status}"><div class="warning-icon">${icon}</div><div><div class="warning-title">${title}</div><div class="warning-text">${text}</div></div></div>`);
+  });
+  document.getElementById('trendCards').innerHTML = cards.join('');
+}
+
+// PROCESSING TIME CHART (grouped bar)
+function drawProcessingChart() {
+  const svg = document.getElementById('procChart');
+  const W=860,H=340,pad={t:20,r:20,b:55,l:55};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+  const mainCarriers = ['CESKA_POSTA_CZ&SK','PACKETA_CZ&SK','DPD_SK','DPD_CZ'];
+  const maxVal=35;
+  const tc=getTextColor(),gc=getGridColor();
+  let html='';
+  for(let i=0;i<=5;i++){
+    const y=pad.t+cH-(cH*i/5);
+    const v=(maxVal*i/5).toFixed(0);
+    html+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="${gc}" stroke-width="1"/>`;
+    html+=`<text x="${pad.l-8}" y="${y+4}" text-anchor="end" fill="${tc}" font-size="11">${v}h</text>`;
+  }
+  const groupW=cW/months.length;
+  const subBarW=groupW*0.7/mainCarriers.length;
+  months.forEach((m,mi) => {
+    const groupX=pad.l+mi*groupW;
+    mainCarriers.forEach((c,ci) => {
+      const val=procData[m][c]||0;
+      if(val===0) return;
+      const h=(val/maxVal)*cH;
+      const x=groupX+(groupW*0.15)+ci*subBarW;
+      const y=pad.t+cH-h;
+      html+=`<rect x="${x}" y="${y}" width="${subBarW-2}" height="${h}" fill="${carrierColors[c]}" rx="2"><title>${carrierNames[c]}: ${val}h</title></rect>`;
+      if(subBarW>18) html+=`<text x="${x+subBarW/2-1}" y="${y-4}" text-anchor="middle" fill="${tc}" font-size="9">${val}</text>`;
+    });
+    html+=`<text x="${groupX+groupW/2}" y="${H-pad.b+20}" text-anchor="middle" fill="${tc}" font-size="10.5">${m}</text>`;
+  });
+  svg.innerHTML=html;
+  document.getElementById('procLegend').innerHTML = mainCarriers.map(c => `<div class="legend-item"><div class="legend-dot" style="background:${carrierColors[c]}"></div>${carrierNames[c]}</div>`).join('');
+}
+
+// CZ vs SK
+function drawCZSK() {
+  const czTotal = czData.reduce((s,v)=>s+v,0);
+  const skTotal = skData.reduce((s,v)=>s+v,0);
+  const total = czTotal + skTotal;
+  const czPct = (czTotal/total*100).toFixed(1);
+  const skPct = (skTotal/total*100).toFixed(1);
+
+  let html = `<div style="display:flex;gap:14px;margin-bottom:24px;">
+    <div style="flex:${Math.round(czTotal/total*10)};background:var(--brand);border-radius:8px;padding:14px;color:#fff;text-align:center;">
+      <div style="font-size:28px;font-weight:800;">${czPct} %</div>
+      <div style="font-size:13px;opacity:.85;">Česká republika</div>
+      <div style="font-size:12px;opacity:.65;">${fmt(czTotal)} zásilek</div>
+    </div>
+    <div style="flex:${Math.max(1,Math.round(skTotal/total*10))};background:var(--accent);border-radius:8px;padding:14px;color:#fff;text-align:center;">
+      <div style="font-size:28px;font-weight:800;">${skPct} %</div>
+      <div style="font-size:13px;opacity:.85;">Slovensko</div>
+      <div style="font-size:12px;opacity:.65;">${fmt(skTotal)} zásilek</div>
+    </div>
+  </div>`;
+
+  // SK carriers detail: DPD_SK handles all SK shipments
+  html += `<div style="margin-top:16px;"><p style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;">Slovenské zásilky jsou obsluhovány výhradně přepravcem <strong style="color:var(--text)">DPD SK</strong> (${fmt(skTotal)} zásilek). České zásilky obsluhují Česká pošta, Packeta, DPD CZ a Ostatní.</p></div>`;
+
+  // Monthly CZ/SK bars
+  html += '<div style="margin-top:16px;">';
+  months.forEach((m,mi) => {
+    const cz=czData[mi], sk=skData[mi], t=cz+sk;
+    const czP=(cz/t*100).toFixed(1), skP=(sk/t*100).toFixed(1);
+    html += `<div class="carrier-bar-wrapper">
+      <div class="carrier-label"><span>${monthsFull[mi]}</span><span style="font-weight:600">CZ: ${czP} % | SK: ${skP} %</span></div>
+      <div style="display:flex;height:24px;border-radius:6px;overflow:hidden;">
+        <div style="width:${czP}%;background:var(--brand);display:flex;align-items:center;padding-left:8px;color:#fff;font-size:11px;font-weight:600;">${fmt(cz)}</div>
+        <div style="width:${skP}%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;">${fmt(sk)}</div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('czskContent').innerHTML = html;
+}
+
+function drawAll() {
+  drawDonut();
+  drawStackedBar();
+  drawTable();
+  drawTrendAnalysis();
+  drawProcessingChart();
+  drawCZSK();
+}
+drawAll();
+
+// Active nav on scroll
+const sections = document.querySelectorAll('.section[id], .header[id]');
+const navLinks = document.querySelectorAll('.sidebar-nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if(a.getAttribute('href') === '#'+current) a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
