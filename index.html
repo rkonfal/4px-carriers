@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analýza přepravců — Diamond Plus</title>
+<title>Kolik platíme za přepravu — Diamond Plus</title>
 <style>
 :root {
   --brand: #5C2450;
@@ -341,6 +341,23 @@ body {
     </style>
 </head>
 <body>
+<div style="background:#1a3a5c;border-left:5px solid #f0a500;padding:18px 24px;margin:18px 18px 0 18px;border-radius:8px;font-family:sans-serif;color:#fff;">
+  <h3 style="margin:0 0 10px;color:#f0a500;font-size:1.1em;">💡 Kde můžeme ušetřit?</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="background:#7b4a00;border-radius:6px;padding:10px 14px;flex:1;min-width:220px;">
+      ⚠️ <strong>Packeta zdražila 2×</strong><br>
+      <span style="font-size:0.9em;">Dopad na marži: +X Kč/balík. Doporučení: <em>vyjednat nové podmínky nebo přesunout část objemu jinam.</em></span>
+    </div>
+    <div style="background:#4a1a1a;border-radius:6px;padding:10px 14px;flex:1;min-width:220px;">
+      🔴 <strong>DPD — nejdražší přepravce</strong><br>
+      <span style="font-size:0.9em;">Stojí za to? Porovnat cenu vs. kvalitu doručení. Zvážit přesun do levnější alternativy.</span>
+    </div>
+  </div>
+  <p style="margin:10px 0 0;font-size:0.9em;line-height:1.5;color:#aac8e8;">
+    Přeprava je 2. největší nákladová položka po zboží. Snížení průměrné ceny o 5 Kč/balík = úspora desítek tisíc měsíčně.
+  </p>
+</div>
+
 <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
 </button>
@@ -368,7 +385,7 @@ body {
     </a>
     <a href="#share">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10"/></svg>
-      Podíl přepravců
+      Komu platíme nejvíc
     </a>
     <a href="#trend">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4"/></svg>
@@ -396,11 +413,11 @@ body {
     </a>
     <a href="#cena-za-balik">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM1 10h22"/></svg>
-      📦 Cena za balík
+      📦 Kolik stojí doručit 1 balík
     </a>
     <a href="#payments">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
-      Způsoby plateb
+      Jak zákazníci platí
     </a>
   </nav>
   <div class="sidebar-footer">
@@ -413,7 +430,7 @@ body {
   <div class="header" id="kpi">
     <div class="header-row">
       <div>
-        <h1>Analýza přepravců — Diamond Plus</h1>
+        <h1>Kolik platíme za přepravu — Diamond Plus</h1>
         <div class="period">Období: duben 2025 – březen 2026 &nbsp;|&nbsp; 9 měsíců &nbsp;|&nbsp; Diamond Plus / Království TianDe</div>
       </div>
       <button class="theme-toggle" onclick="toggleTheme()">
@@ -451,7 +468,7 @@ body {
   <div class="section" id="share">
     <div class="section-title">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10"/></svg>
-      Podíl přepravců celkově
+      Komu platíme nejvíc celkově
     </div>
     <div class="donut-wrapper">
       <svg id="donutChart" viewBox="0 0 200 200" width="220" height="220"></svg>
@@ -514,7 +531,7 @@ body {
   <div class="section" id="naklady">
     <div class="section-title">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      Náklady na přepravce
+      Co nás stojí přeprava
       <span style="font-size:13px;font-weight:400;color:var(--text-muted);margin-left:8px;">Účetní denik &middot; Q1 2026</span>
     </div>
 
@@ -640,9 +657,9 @@ body {
       </table>
     </div>
 
-    <!-- Cena za balík — všichni přepravci -->
+    <!-- Kolik stojí doručit 1 balík — všichni přepravci -->
     <div style="border-top:1px solid var(--border);padding-top:28px;margin-top:4px;" id="cena-za-balik">
-      <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text);">Cena za balík — všichni přepravci</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text);">Kolik stojí doručit 1 balík — všichni přepravci</div>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
         Průměr za leden a únor 2026. 4PX (pouze handling/expedice) je poděleno celkovým počtem zásilek —
         vztahuje se na <em>každý</em> balík bez ohledu na přepravce. Obalový materiál a tisk jsou sledovány zvlášť.
@@ -792,7 +809,7 @@ body {
   <div class="section" id="payments">
     <div class="section-title">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
-      Způsoby plateb zákazníků
+      Jak zákazníci platí zákazníků
     </div>
     <div class="two-col" style="align-items:start">
       <div class="donut-wrapper" style="justify-content:flex-start;gap:32px">
